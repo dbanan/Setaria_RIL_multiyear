@@ -1,11 +1,19 @@
 #Setaria_PCA_phenotypes.R 
 
 #6/12/18
-
 #migrate analysis from May data meeting 
+#6/26/18
+#now on git 
 
 
 #####PCA BLUPLESS######
+
+counts<-c("branch_number", "tiller_number", "leaf_number", "panicle_number")
+mass<-c("leaf_mass","panicle_mass","stem_mass","vegetative_mass","total_mass","reproductive_vegetative_mass_ratio")
+size<-c("culm_height", "tiller_height", "basal_circumference")
+devo<-c("panicle_emergence_DAS", "dead_percent", "green_percent", "leaf_number_dead", "leaf_number_green")
+
+
 
 #this is currently blupless data 
 #working from output of data transformation script
