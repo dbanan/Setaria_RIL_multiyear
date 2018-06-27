@@ -3,26 +3,21 @@
 #6/12/18
 #migrate analysis from May data meeting 
 #6/26/18
-#now on git 
+#now on git, this script (fingers crossed) should run smoothly from the BLUP calculation output 
 
-
-#####PCA BLUPLESS######
-
-counts<-c("branch_number", "tiller_number", "leaf_number", "panicle_number")
-mass<-c("leaf_mass","panicle_mass","stem_mass","vegetative_mass","total_mass","reproductive_vegetative_mass_ratio")
-size<-c("culm_height", "tiller_height", "basal_circumference")
-devo<-c("panicle_emergence_DAS", "dead_percent", "green_percent", "leaf_number_dead", "leaf_number_green")
+library(plyr)
+library(ggbiplot)
+library(reshape2)
 
 
 
-#this is currently blupless data 
-#working from output of data transformation script
 
-#change 2013 dry to wet
-pe_bmh_trans$treatment[pe_bmh_trans$year==2013&pe_bmh_trans$treatment=="dry"]<-"wet"
+load("RIL_BLUP.Rdata")
+
+#####PCA BLUP######
 
 #just on thick planted 
-pe_bmh_thick<-pe_bmh_trans[-which(pe_bmh_trans$treatment=="sparse"),]
+just_thick<-rils.blups[-which(rils.blups$treatment=="sparse"),]
 
 #and on just common traits 
 common<-c("panicle_emergence_DAS", 
@@ -36,31 +31,31 @@ common<-c("panicle_emergence_DAS",
           "tiller_number_cbrt"
 )
 
-pe_bmh_common<-subset(pe_bmh_thick, trait %in% common)
+just_common<-subset(just_thick, trait %in% common)
 
-#need genotype*treatment averages 
-pe_bmh_g<-ddply(pe_bmh_common, c("year", "experiment", "treatment", "genotype", "trait"), summarise, data=mean(data, na.rm=TRUE))
+#need genotype*treatment averages (on BLUP predicted values)
+just_geno<-ddply(just_common, c("year", "experiment", "treatment", "genotype", "trait"), summarise, data=mean(predicted, na.rm=TRUE))
 
-pe_bmh_g$environment<-paste(pe_bmh_g$treatment, pe_bmh_g$year, sep="_")
+just_geno$environment<-paste(just_geno$treatment, just_geno$year, sep="_")
 
 #wide by trait and still long genotype and environment
-pe_bmh_w<-dcast(pe_bmh_g, environment+genotype~trait, value.var="data")
+just_wide<-dcast(just_geno, environment+genotype~trait, value.var="data")
 
 #complete cases?
-pe_bmh_w1<-pe_bmh_w[complete.cases(pe_bmh_w),]
+just_wide1<-just_wide[complete.cases(just_wide),]
 
 #pull out environment column 
-env<-pe_bmh_w1[,1]
+env<-just_wide1[,1]
 
 #join genotype and environment
-pe_bmh_w1$name<-paste(pe_bmh_w1$genotype, pe_bmh_w1$environment, sep="_")
-rownames(pe_bmh_w1)<-pe_bmh_w1$name
-pe_bmh_w1$name<-NULL
+just_wide1$name<-paste(just_wide1$genotype, just_wide1$environment, sep="_")
+rownames(just_wide1)<-just_wide1$name
+just_wide1$name<-NULL
 
-pe_bmh_w2<-pe_bmh_w1[,c(3:10)]
+just_wide2<-just_wide1[,c(3:10)]
 
 
-pca_try<-prcomp(pe_bmh_w2, center=TRUE, scale.=TRUE)
+pca_try<-prcomp(just_wide2, center=TRUE, scale.=TRUE)
 
 
 pca_try$sdev
@@ -85,27 +80,6 @@ ggbiplot(pca_try, choices=c(1,2),obs.scale=1, var.scale=1, groups=env, ellipse=T
 ggbiplot(pca_try, choices=c(1,3),obs.scale=1, var.scale=1, groups=env, ellipse=TRUE)
 
 ggbiplot(pca_try, choices=c(2,3),obs.scale=1, var.scale=1, groups=env, ellipse=TRUE)
-
-
-
-
-
-
-
-
-
-
-#####PCA BLUP#####
-
-#2013 not working? 
-
-
-
-
-
-
-
-
 
 
 
