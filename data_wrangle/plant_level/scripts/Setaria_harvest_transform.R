@@ -1,4 +1,4 @@
-#Setaria_derive_transform_ver2
+#Setaria_derive_transform
 
 # GIT first entry
 
@@ -8,13 +8,9 @@
 #thinking further ahead, BLUPs will be calcualted on a trimmed dataset (keep transformed, ditch corresponding original observations)
 
 
-#outliers 
-#id obs already flagged from previous analysis 
-outliers_ht<-subset(all_ht, flag>0)
-#assign flag=0 to NA in flag column 
-all_ht$flag[is.na(all_ht$flag)]<-0
-#remove flag=2
-all_ht1<-subset(all_ht, flag<2)
+#load object with cleaned plant_level data 
+load("../data/harvest_phenotypes_clean.Rdata")
+
 
 
 
@@ -72,19 +68,26 @@ ggplot(subset(all_stack1[-which(all_stack1$treatment=='sparse'),], trait %in% co
 
 
 #looks like cube root is the way to go for counts, replace raw count data with cube root transformed values 
-all_counts_trans<-subset(all_stack2, trait %in% counts)
+all_counts_trans<-subset(all_stack1, trait %in% counts)
 all_counts_trans1<-all_counts_trans[,c(1:6,9)]
 colnames(all_counts_trans1)[7]<-"data"
 all_counts_trans1$new_trait<-paste(all_counts_trans1$trait, "cbrt", sep="_")
 all_counts_trans1<-all_counts_trans1[,c(1:5,7,8)]
 colnames(all_counts_trans1)[7]<-"trait"
 
-all_stack3<-all_stack1[-which(all_stack1$trait %in% counts),]
 
 
-all_stack4<-rbind(all_stack3, all_counts_trans1)
 
-pe_bmh_trans<-all_stack4
+#stack transformed and original dataset 
+all_stack2<-rbind(all_counts_trans1, all_stack)
+
+
+
+
+#transformed r object for merge with megadataset and further dataset 
+save(all_stack2, file="../data/harvest_phenotypes_clean_transformed.Rdata")
+
+
 
 
 
