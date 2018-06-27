@@ -1,9 +1,27 @@
+#Setaria_fetch_harvest_data
+
+#bring in plant-level harvest data from 2013-2015 RIL experiments 
+#raw data is from:
+##2013 and 2014 REP and DB SAS "step_2" efforts 
+##2015 prelim "ready" efforts 
+
+#this script infiles, formats, and addresses various legacy errors (ex tiller_number=0)
+#product will be a cleaned plant-level dataset (see bottom of script for .csv and robject generation)
+
+
 library(reshape2)
 library(ggplot2)
 library(plyr)
 
 
+
+
+
+
+######INFILE######
 #infile the various phenotype files 
+#note to future self...consider writing a function to infile data regardless of machine and Rproj (see Feldman & Ellsworth manuscript repo for function examples)
+#for now, will use relative path starting at Rproj
 
 #2013 Density 
 ht_13DN<-read.csv("../data/raw_trait_data/13DN_BMH_traits_step_2.csv",header=T, stringsAsFactors=FALSE, na.strings=".")
@@ -16,20 +34,22 @@ hw_13DR<-read.csv("../data/raw_trait_data/13DR_BMH_weights_step_2.csv",header=T,
 pe_13DR<-read.csv("../data/raw_trait_data/13DR_panicle_emergence_step_2.csv",header=T, stringsAsFactors=FALSE, na.strings=".")
 
 #2014 Drought 
-ht_14DR<-read.csv("./data/raw_trait_data/14DR_BMH_traits_step_2.csv",header=T, stringsAsFactors=FALSE, na.strings=".")
-hw_14DR<-read.csv("./data/raw_trait_data/14DR_BMH_weights_step_2.csv",header=T, stringsAsFactors=FALSE, na.strings=".")
-pe_14DR<-read.csv("./data/raw_trait_data/14DR_panicle_emergence_step_2.csv",header=T, stringsAsFactors=FALSE, na.strings=".")
+ht_14DR<-read.csv("../data/raw_trait_data/14DR_BMH_traits_step_2.csv",header=T, stringsAsFactors=FALSE, na.strings=".")
+hw_14DR<-read.csv("../data/raw_trait_data/14DR_BMH_weights_step_2.csv",header=T, stringsAsFactors=FALSE, na.strings=".")
+pe_14DR<-read.csv("../data/raw_trait_data/14DR_panicle_emergence_step_2.csv",header=T, stringsAsFactors=FALSE, na.strings=".")
 
 #2014 Density 
-ht_14DN<-read.csv("./data/raw_trait_data/14DN_BMH_traits_step_2.csv",header=T, stringsAsFactors=FALSE, na.strings=".")
-hw_14DN<-read.csv("./data/raw_trait_data/14DN_BMH_weights_step_2.csv",header=T, stringsAsFactors=FALSE, na.strings=".")
-pe_14DN<-read.csv("./data/raw_trait_data/14DN_panicle_emergence_step_2.csv",header=T, stringsAsFactors=FALSE, na.strings=".")
+ht_14DN<-read.csv("../data/raw_trait_data/14DN_BMH_traits_step_2.csv",header=T, stringsAsFactors=FALSE, na.strings=".")
+hw_14DN<-read.csv("../data/raw_trait_data/14DN_BMH_weights_step_2.csv",header=T, stringsAsFactors=FALSE, na.strings=".")
+pe_14DN<-read.csv("../data/raw_trait_data/14DN_panicle_emergence_step_2.csv",header=T, stringsAsFactors=FALSE, na.strings=".")
 
 #2015 Drought 
-pe_15DR<-read.csv("./data/raw_trait_data/15DR panicle emergence ready.csv",header=T, stringsAsFactors=FALSE, na.strings=".")
-wp_15DR<-read.csv("./data/raw_trait_data/15DR water potential ready.csv", header=T, stringsAsFactors=FALSE, na.strings=".")
-ht_15DR<-read.csv("./data/raw_trait_data/15DR biomass traits ready.csv",header=T, stringsAsFactors=FALSE, na.strings=".")
-hw_15DR<-read.csv("./data/raw_trait_data/15DR biomass weights ready.csv",header=T, stringsAsFactors=FALSE, na.strings=".")
+pe_15DR<-read.csv("../data/raw_trait_data/15DR panicle emergence ready.csv",header=T, stringsAsFactors=FALSE, na.strings=".")
+wp_15DR<-read.csv("../data/raw_trait_data/15DR water potential ready.csv", header=T, stringsAsFactors=FALSE, na.strings=".")
+ht_15DR<-read.csv("../data/raw_trait_data/15DR biomass traits ready.csv",header=T, stringsAsFactors=FALSE, na.strings=".")
+hw_15DR<-read.csv("../data/raw_trait_data/15DR biomass weights ready.csv",header=T, stringsAsFactors=FALSE, na.strings=".")
+
+
 
 #####HARVEST DAS######
 #pull out harvest DAS
@@ -48,6 +68,9 @@ ht_15DR_hd<-subset(ht_15DR, trait=="harvest_das")
 ht_15DR_hd<-ht_15DR_hd[,c(4,7)]
 colnames(ht_15DR_hd)[2]<-"harvest_DAS"
 ht_15DR<-merge(ht_15DR, ht_15DR_hd, by=c("subplot_id"))
+
+#later will use this harvest DAS data to show harvest DAS effect on harvest data (supplemental)
+
 
 
 #####PANICLE EMERGENCE#####
@@ -185,7 +208,6 @@ all_ht$data[all_ht$trait=="tiller_number"&all_ht$data<1]<-1
 #trim down to just relevant traits and experiment 
 branch_fix<-all_ht[which(all_ht$year==2013 & all_ht$trait %in% c("culm_height", "branch_number")),]
 #swing
-all_hww<-dcast(all_hw, year+experiment+genotype+treatment+subplot_id~trait, value.var="data")
 branch_wide<-dcast(branch_fix, year+experiment+genotype+treatment+subplot_id+rep~trait, value.var="data")
 #switch na to 0 where appropriate 
 branch_wide$branch_number[is.na(branch_wide$branch_number) & branch_wide$culm_height>1]<-0
@@ -225,7 +247,7 @@ ggplot(all_ht2, aes(x=treatment, y=data, fill=treatment))+
 all_hts<-ddply(all_ht2, c("year", "experiment", "genotype", "treatment", "subplot_id", "trait"), summarise,
                data=mean(data, na.rm=TRUE))
 
-#NaN's result from division of 0? 
+#NaN's result from division of 0? why would this still be here? 
 
 
 
@@ -317,9 +339,12 @@ ggplot(all_stack, aes(x=treatment, y=data, fill=treatment))+
 
 
 
+######PRODUCT######
+
+save(all_stack, file="../data/harvest_phenotypes_clean.Rdata")
 
 
-
+write.csv(all_stack, file="../harvest_phenotypes_clean.csv", row.names=FALSE)
 
 
 
