@@ -344,7 +344,7 @@ ggplot(all_stack, aes(x=treatment, y=data, fill=treatment))+
 save(all_stack, file="../data/harvest_phenotypes_clean.Rdata")
 
 
-write.csv(all_stack, file="../harvest_phenotypes_clean.csv", row.names=FALSE)
+write.csv(all_stack, file="../data/harvest_phenotypes_clean.csv", row.names=FALSE)
 
 
 
