@@ -6,14 +6,14 @@ library(plyr)
 #infile the various phenotype files 
 
 #2013 Density 
-ht_13DN<-read.csv("./data/raw_trait_data/13DN_BMH_traits_step_2.csv",header=T, stringsAsFactors=FALSE, na.strings=".")
-hw_13DN<-read.csv("./data/raw_trait_data/13DN_BMH_weights_step_2.csv",header=T, stringsAsFactors=FALSE, na.strings=".")
-pe_13DN<-read.csv("./data/raw_trait_data/13DN_panicle_emergence_step_2.csv",header=T, stringsAsFactors=FALSE, na.strings=".")
+ht_13DN<-read.csv("../data/raw_trait_data/13DN_BMH_traits_step_2.csv",header=T, stringsAsFactors=FALSE, na.strings=".")
+hw_13DN<-read.csv("../data/raw_trait_data/13DN_BMH_weights_step_2.csv",header=T, stringsAsFactors=FALSE, na.strings=".")
+pe_13DN<-read.csv("../data/raw_trait_data/13DN_panicle_emergence_step_2.csv",header=T, stringsAsFactors=FALSE, na.strings=".")
 
 #2013 Drought 
-ht_13DR<-read.csv("./data/raw_trait_data/13DR_BMH_traits_step_2.csv",header=T, stringsAsFactors=FALSE, na.strings=".")
-hw_13DR<-read.csv("./data/raw_trait_data/13DR_BMH_weights_step_2.csv",header=T, stringsAsFactors=FALSE, na.strings=".")
-pe_13DR<-read.csv("./data/raw_trait_data/13DR_panicle_emergence_step_2.csv",header=T, stringsAsFactors=FALSE, na.strings=".")
+ht_13DR<-read.csv("../data/raw_trait_data/13DR_BMH_traits_step_2.csv",header=T, stringsAsFactors=FALSE, na.strings=".")
+hw_13DR<-read.csv("../data/raw_trait_data/13DR_BMH_weights_step_2.csv",header=T, stringsAsFactors=FALSE, na.strings=".")
+pe_13DR<-read.csv("../data/raw_trait_data/13DR_panicle_emergence_step_2.csv",header=T, stringsAsFactors=FALSE, na.strings=".")
 
 #2014 Drought 
 ht_14DR<-read.csv("./data/raw_trait_data/14DR_BMH_traits_step_2.csv",header=T, stringsAsFactors=FALSE, na.strings=".")
