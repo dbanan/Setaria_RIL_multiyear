@@ -1,24 +1,33 @@
-#Setaria_data_merge
+#Setaria_fetch_leaf_data.R 
 
+#load "step_2" leaf data, do any necessary cleaning, formatting before data merge. 
 
-
-#merge leaf-plant data  
-
-
-library(ggplot2)
-library(reshape2)
 
 #leaf
-leaf<-read.csv("../data_wrangle/leaf_level/Set_RIL_leaf_data_subplot_level.csv", header=T, stringsAsFactors=FALSE)
+#leaf<-read.csv("../data_wrangle/leaf_level/Set_RIL_leaf_data_subplot_level.csv", header=T, stringsAsFactors=FALSE)
+
+#re-running with newest data version 
+load("../data_wrangle/leaf_level/Set_RIL_field_leaf_level_subplot_data.Rdata")
+
 
 #still have some errant genotype names
-leaf$genotype[leaf$genotype==" A10"]<-"A10"
-leaf$genotype[leaf$genotype==" B100"]<-"B100"
-leaf$genotype[leaf$genotype=="RIL_60"]<-"RIL_060"
-leaf$genotype[leaf$genotype=="RIL_98"]<-"RIL_098"
-leaf$genotype[leaf$genotype=="RIL_72"]<-"RIL_072"
-leaf$genotype[leaf$genotype=="RIL_78"]<-"RIL_078"
-leaf$genotype[leaf$genotype=="RIL_18"]<-"RIL_018"
+leaf.level$genotype[leaf.level$genotype==" A10"]<-"A10"
+leaf.level$genotype[leaf.level$genotype==" B100"]<-"B100"
+leaf.level$genotype[leaf.level$genotype=="RIL_60"]<-"RIL_060"
+leaf.level$genotype[leaf.level$genotype=="RIL_98"]<-"RIL_098"
+leaf.level$genotype[leaf.level$genotype=="RIL_72"]<-"RIL_072"
+leaf.level$genotype[leaf.level$genotype=="RIL_78"]<-"RIL_078"
+leaf.level$genotype[leaf.level$genotype=="RIL_18"]<-"RIL_018"
+
+#scale 2015 drought length and width from cm to mm (x10)?
+
+
+#output and ready for merge 
+save(leaf.level, file="../data_wrangle/leaf_level/leaf_phenotypes_clean.Rdata")
+
+
+
+
 
 
 
@@ -31,7 +40,8 @@ plant<-all_stack2
 #leaf data lacks treatment column? 
 #so extract experimental design information from plant data? and merge with leaf data? 
 design_only<-unique(plant[,c(1:5)])
-leaf<-merge(leaf, design_only, by=c("year","experiment", "genotype", "subplot_id"), all=T)
+leaf<-merge(leaf, design_only, by=c("year","experiment", "genotype", "subplot_id"))
+
 
 #quick leaf level visualization 
 ggplot(leaf, aes(x=treatment, y=data, fill=treatment))+
@@ -54,31 +64,6 @@ lp<-rbind(leaf, plant)
 ####PRODUCT####
 save(lp, file="./merged_phenotypes.Rdata")
 write.csv(lp, file="./merged_phenotypes_clean.csv", row.names=FALSE)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
