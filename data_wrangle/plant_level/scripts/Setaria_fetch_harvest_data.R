@@ -198,10 +198,13 @@ ggplot(all_ht, aes(x=treatment, y=data, fill=treatment))+
 #errant NA
 aggregate(data~year+experiment+trait, data=all_ht, function(x) {sum(is.na(x))}, na.action=NULL)
 #errant data=0
-aggregate(data~year+experiment+trait, data=all_ht, function(x) {sum(is.na(x))}, na.action=NULL)
+#aggregate(data~year+experiment+trait, data=all_ht, function(x) {sum(is.na(x))}, na.action=NULL)
 
 #tiller number = 0 should be changed to = 1 
 #branch number = NA should be = 0
+
+#why so many NA for leaf_number and panicle number 2013 drought? is it because we only measured in density that year?
+#tiller_height NA in 2015 drought is because we did not measure it that year? 
 
 #tiller number fix 
 all_ht$data[all_ht$trait=="tiller_number"&all_ht$data<1]<-1
@@ -320,13 +323,13 @@ all_hwl<-melt(all_hww, id.vars=c("year","experiment","genotype","treatment","sub
 #subset mass ratio data (mr), pull out reproductive_vegatative_mass_ratio and leaf_mass_ratio prior to calculating mass per harvest DAS
 all_mr<-subset(all_hwl, trait %in% c("reproductive_vegetative_mass_ratio", "leaf_mass_ratio"))
 
-just_thick<-rils.blups[-which(rils.blups$treatment=="sparse"),]
+
 
 
 
 #merge with harvest_DAS to calculate harvest mass / harvest date 
-all_hwl1<-all_hwl1[-which(all_hwl1$trait %in% c("reproductive_vegetative_mass_ratio", "leaf_mass_ratio")),]
-all_hwl1<-merge(all_hwl, all_hd, by=c("year","experiment","subplot_id"))
+all_hwl1<-all_hwl[-which(all_hwl$trait %in% c("reproductive_vegetative_mass_ratio", "leaf_mass_ratio")),]
+all_hwl1<-merge(all_hwl1, all_hd, by=c("year","experiment","subplot_id"))
 
 #generate two mass traits: mass at harvest and mass per DAS
 all_hwl1$per_DAS<-all_hwl1$data/all_hwl1$harvest_DAS
@@ -374,7 +377,7 @@ ggplot(all_stack, aes(x=treatment, y=data, fill=treatment))+
 save(all_stack, file="../data_wrangle/plant_level/data/harvest_phenotypes_clean.Rdata")
 
 
-write.csv(all_stack, file="../data/harvest_phenotypes_clean.csv", row.names=FALSE)
+
 
 
 
