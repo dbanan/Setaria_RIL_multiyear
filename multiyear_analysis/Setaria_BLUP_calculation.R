@@ -9,9 +9,13 @@ library(lme4)
 library(nlme)
 
 
-#need a better way of getting r object into working environment (regardless of user/machine)
-#write a function later?
-load("/de/github/dbanan/auth/Setaria_RIL_multiyear/data_wrangle/plant_level/data/harvest_phenotypes_clean_transformed.Rdata")
+
+#load merged leaf-plant data 
+load("./merged_phenotypes.Rdata")
+
+
+#change name to match previous iteration of BLUP calculation loops 
+all_stack2<-lp
 
 
 parent.data=all_stack2[which(all_stack2$genotype %in% c('A10','B100')),]
@@ -51,9 +55,11 @@ dev.off()
 #we need to run a blup model for all the traits measured across the experiments within each environment
 
 all<-all_stack2
+all <- na.omit(all)
+
 
 #change 2013 dry to wet 
-all$treatment[all$year==2013 & all$treatment=="dry"]<-"wet"
+#all$treatment[all$year==2013 & all$treatment=="dry"]<-"wet"
 
 
 #make environment column
