@@ -128,6 +128,8 @@ for(d in 1:length(exp.combos)){
 
 
 
+######PRODUCT#####
+
 #output BLUP values for further analysis 
 save(rils.blups, file="RIL_BLUP.Rdata")
 

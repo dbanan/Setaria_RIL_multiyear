@@ -12,8 +12,9 @@ library(reshape2)
 
 
 
+#load BLUPs
 load("RIL_BLUP.Rdata")
-#load("merged_phenotypes.Rdata")
+
 
 
 
@@ -23,15 +24,14 @@ load("RIL_BLUP.Rdata")
 #just on thick planted 
 just_thick<-rils.blups[-which(rils.blups$treatment=="sparse"),]
 
-#just_thick<-lp[-which(lp$treatment=="sparse"),]
 
-
+#ditch 2014 drought for this run because i dont know better... 
 just_thick$yr_exp<-paste(just_thick$year, just_thick$experiment, sep="_")
 just_thick<-just_thick[-which(just_thick$yr_exp=="2014_drought")]
 
 
-#and on just common traits (version for many environments but few traits; few environments but many traits)
-#need to test mass at harvest and mass per DAS
+#lists for just common traits (version for many environments but few traits; few environments but many traits)
+#future: need to test mass at harvest and mass per DAS
 
 common<-c("panicle_emergence_DAS", 
           "leaf_mass_at_harvest", 
@@ -113,6 +113,7 @@ biplot(pca_try)
 
 pca_try_table<-rbind(pca_try$rotation, pca_try$sdev)
 
+#visualize
 
 ggbiplot(pca_try, choices=c(1,2),obs.scale=1, var.scale=1, groups=env, ellipse=TRUE)
 
@@ -141,7 +142,7 @@ dev.off()
 
 ####CORRELATIONS####
 
-#should eventually move this to a separate script? treat this version (7/27) as early visualization for 7/24 meeting. 
+#should eventually move this to a separate script? treat below as early visualization for 7/24 meeting. 
 
 
 
@@ -161,6 +162,8 @@ cols[just_wide$environment=="wet_2015"]<-"purple"
 png("./results/pairs_all.png", width=800, height=800)
 pairs(just_wide1[3:18], pch=21, col=cols)
 dev.off()      
+
+#split into useful groups (hopefully)
 
 #leaf and architecture 
 png("./results/pairs_leaf_arch.png", width=900, height=700)
