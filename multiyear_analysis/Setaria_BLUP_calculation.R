@@ -8,7 +8,19 @@ library(nlme)
 #read in data
 load("../data_wrangle/plant_level/data/harvest_phenotypes_clean_transformed.Rdata")
 
+<<<<<<< HEAD
 #pull out parent data to use for linear modeling
+=======
+
+#load merged leaf-plant data 
+load("./merged_phenotypes.Rdata")
+
+
+#change name to match previous iteration of BLUP calculation loops 
+all_stack2<-lp
+
+
+>>>>>>> 86c482beffa0fec53006583754022ec3833109e2
 parent.data=all_stack2[which(all_stack2$genotype %in% c('A10','B100')),]
 parent.data$environment=paste(parent.data$experiment,parent.data$year, sep='_')
 for (i in 1:nrow(parent.data)){
@@ -46,9 +58,15 @@ dev.off()
 #we need to run a blup model for all the traits measured across the experiments within each environment
 
 all<-all_stack2
+all <- na.omit(all)
+
 
 #change 2013 dry to wet 
+<<<<<<< HEAD
 all$treatment[which(all$year==2013 & all$treatment=="dry")]<-"wet"
+=======
+#all$treatment[all$year==2013 & all$treatment=="dry"]<-"wet"
+>>>>>>> 86c482beffa0fec53006583754022ec3833109e2
 
 
 #make environment column
@@ -116,6 +134,8 @@ for(d in 1:length(exp.combos)){
 }
 
 
+
+######PRODUCT#####
 
 #output BLUP values for further analysis 
 save(rils.blups, file="RIL_BLUP.Rdata")

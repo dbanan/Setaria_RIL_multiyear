@@ -24,30 +24,30 @@ library(plyr)
 #for now, will use relative path starting at Rproj
 
 #2013 Density 
-ht_13DN<-read.csv("../data/raw_trait_data/13DN_BMH_traits_step_2.csv",header=T, stringsAsFactors=FALSE, na.strings=".")
-hw_13DN<-read.csv("../data/raw_trait_data/13DN_BMH_weights_step_2.csv",header=T, stringsAsFactors=FALSE, na.strings=".")
-pe_13DN<-read.csv("../data/raw_trait_data/13DN_panicle_emergence_step_2.csv",header=T, stringsAsFactors=FALSE, na.strings=".")
+ht_13DN<-read.csv("../data_wrangle/plant_level/data/raw_trait_data/13DN_BMH_traits_step_2.csv",header=T, stringsAsFactors=FALSE, na.strings=".")
+hw_13DN<-read.csv("../data_wrangle/plant_level/data/raw_trait_data/13DN_BMH_weights_step_2.csv",header=T, stringsAsFactors=FALSE, na.strings=".")
+pe_13DN<-read.csv("../data_wrangle/plant_level/data/raw_trait_data/13DN_panicle_emergence_step_2.csv",header=T, stringsAsFactors=FALSE, na.strings=".")
 
 #2013 Drought 
-ht_13DR<-read.csv("../data/raw_trait_data/13DR_BMH_traits_step_2.csv",header=T, stringsAsFactors=FALSE, na.strings=".")
-hw_13DR<-read.csv("../data/raw_trait_data/13DR_BMH_weights_step_2.csv",header=T, stringsAsFactors=FALSE, na.strings=".")
-pe_13DR<-read.csv("../data/raw_trait_data/13DR_panicle_emergence_step_2.csv",header=T, stringsAsFactors=FALSE, na.strings=".")
+ht_13DR<-read.csv("../data_wrangle/plant_level/data/raw_trait_data/13DR_BMH_traits_step_2.csv",header=T, stringsAsFactors=FALSE, na.strings=".")
+hw_13DR<-read.csv("../data_wrangle/plant_level/data/raw_trait_data/13DR_BMH_weights_step_2.csv",header=T, stringsAsFactors=FALSE, na.strings=".")
+pe_13DR<-read.csv("../data_wrangle/plant_level/data/raw_trait_data/13DR_panicle_emergence_step_2.csv",header=T, stringsAsFactors=FALSE, na.strings=".")
 
 #2014 Drought 
-ht_14DR<-read.csv("../data/raw_trait_data/14DR_BMH_traits_step_2.csv",header=T, stringsAsFactors=FALSE, na.strings=".")
-hw_14DR<-read.csv("../data/raw_trait_data/14DR_BMH_weights_step_2.csv",header=T, stringsAsFactors=FALSE, na.strings=".")
-pe_14DR<-read.csv("../data/raw_trait_data/14DR_panicle_emergence_step_2.csv",header=T, stringsAsFactors=FALSE, na.strings=".")
+ht_14DR<-read.csv("../data_wrangle/plant_level/data/raw_trait_data/14DR_BMH_traits_step_2.csv",header=T, stringsAsFactors=FALSE, na.strings=".")
+hw_14DR<-read.csv("../data_wrangle/plant_level/data/raw_trait_data/14DR_BMH_weights_step_2.csv",header=T, stringsAsFactors=FALSE, na.strings=".")
+pe_14DR<-read.csv("../data_wrangle/plant_level/data/raw_trait_data/14DR_panicle_emergence_step_2.csv",header=T, stringsAsFactors=FALSE, na.strings=".")
 
 #2014 Density 
-ht_14DN<-read.csv("../data/raw_trait_data/14DN_BMH_traits_step_2.csv",header=T, stringsAsFactors=FALSE, na.strings=".")
-hw_14DN<-read.csv("../data/raw_trait_data/14DN_BMH_weights_step_2.csv",header=T, stringsAsFactors=FALSE, na.strings=".")
-pe_14DN<-read.csv("../data/raw_trait_data/14DN_panicle_emergence_step_2.csv",header=T, stringsAsFactors=FALSE, na.strings=".")
+ht_14DN<-read.csv("../data_wrangle/plant_level/data/raw_trait_data/14DN_BMH_traits_step_2.csv",header=T, stringsAsFactors=FALSE, na.strings=".")
+hw_14DN<-read.csv("../data_wrangle/plant_level/data/raw_trait_data/14DN_BMH_weights_step_2.csv",header=T, stringsAsFactors=FALSE, na.strings=".")
+pe_14DN<-read.csv("../data_wrangle/plant_level/data/raw_trait_data/14DN_panicle_emergence_step_2.csv",header=T, stringsAsFactors=FALSE, na.strings=".")
 
 #2015 Drought 
-pe_15DR<-read.csv("../data/raw_trait_data/15DR panicle emergence ready.csv",header=T, stringsAsFactors=FALSE, na.strings=".")
-wp_15DR<-read.csv("../data/raw_trait_data/15DR water potential ready.csv", header=T, stringsAsFactors=FALSE, na.strings=".")
-ht_15DR<-read.csv("../data/raw_trait_data/15DR biomass traits ready.csv",header=T, stringsAsFactors=FALSE, na.strings=".")
-hw_15DR<-read.csv("../data/raw_trait_data/15DR biomass weights ready.csv",header=T, stringsAsFactors=FALSE, na.strings=".")
+pe_15DR<-read.csv("../data_wrangle/plant_level/data/raw_trait_data/15DR panicle emergence ready.csv",header=T, stringsAsFactors=FALSE, na.strings=".")
+wp_15DR<-read.csv("../data_wrangle/plant_level/data/raw_trait_data/15DR water potential ready.csv", header=T, stringsAsFactors=FALSE, na.strings=".")
+ht_15DR<-read.csv("../data_wrangle/plant_level/data/raw_trait_data/15DR biomass traits ready.csv",header=T, stringsAsFactors=FALSE, na.strings=".")
+hw_15DR<-read.csv("../data_wrangle/plant_level/data/raw_trait_data/15DR biomass weights ready.csv",header=T, stringsAsFactors=FALSE, na.strings=".")
 
 
 
@@ -155,6 +155,9 @@ all_ht$treatment[all_ht$treatment=="low_density"]<-"sparse"
 all_hd<-ddply(all_ht, c("year", "experiment", "subplot_id"), summarise, harvest_DAS=mean(harvest_DAS))
 
 
+sum(is.na(all_hd$harvest_DAS))
+
+
 
 #consistent trait names 
 all_ht$trait[all_ht$trait=="Panicle_number_per_plant"]<-"panicle_number"
@@ -195,10 +198,13 @@ ggplot(all_ht, aes(x=treatment, y=data, fill=treatment))+
 #errant NA
 aggregate(data~year+experiment+trait, data=all_ht, function(x) {sum(is.na(x))}, na.action=NULL)
 #errant data=0
-aggregate(data~year+experiment+trait, data=all_ht, function(x) {sum(is.na(x))}, na.action=NULL)
+#aggregate(data~year+experiment+trait, data=all_ht, function(x) {sum(is.na(x))}, na.action=NULL)
 
 #tiller number = 0 should be changed to = 1 
 #branch number = NA should be = 0
+
+#why so many NA for leaf_number and panicle number 2013 drought? is it because we only measured in density that year?
+#tiller_height NA in 2015 drought is because we did not measure it that year? 
 
 #tiller number fix 
 all_ht$data[all_ht$trait=="tiller_number"&all_ht$data<1]<-1
@@ -309,12 +315,39 @@ all_hww<-dcast(all_hw, year+experiment+genotype+treatment+subplot_id~trait, valu
 all_hww$vegetative_mass<-all_hww$leaf_mass+all_hww$stem_mass
 all_hww$total_mass<-all_hww$leaf_mass+all_hww$stem_mass+all_hww$panicle_mass
 all_hww$reproductive_vegetative_mass_ratio<-all_hww$panicle_mass/all_hww$vegetative_mass
+all_hww$leaf_mass_ratio<-all_hww$leaf_mass/all_hww$total_mass
 
 #back long 
-all_hwl<-melt(all_hww, id.vars=c("year","experiment","genotype","treatment","subplot_id"), measure.vars=c("leaf_mass", "panicle_mass", "stem_mass", "vegetative_mass", "total_mass", "reproductive_vegetative_mass_ratio"), variable.name="trait",value.name="data")
+all_hwl<-melt(all_hww, id.vars=c("year","experiment","genotype","treatment","subplot_id"), measure.vars=c("leaf_mass", "panicle_mass", "stem_mass", "vegetative_mass", "total_mass", "reproductive_vegetative_mass_ratio", "leaf_mass_ratio"), variable.name="trait",value.name="data")
+
+#subset mass ratio data (mr), pull out reproductive_vegatative_mass_ratio and leaf_mass_ratio prior to calculating mass per harvest DAS
+all_mr<-subset(all_hwl, trait %in% c("reproductive_vegetative_mass_ratio", "leaf_mass_ratio"))
+
+
+
+
+
+#merge with harvest_DAS to calculate harvest mass / harvest date 
+all_hwl1<-all_hwl[-which(all_hwl$trait %in% c("reproductive_vegetative_mass_ratio", "leaf_mass_ratio")),]
+all_hwl1<-merge(all_hwl1, all_hd, by=c("year","experiment","subplot_id"))
+
+#generate two mass traits: mass at harvest and mass per DAS
+all_hwl1$per_DAS<-all_hwl1$data/all_hwl1$harvest_DAS
+colnames(all_hwl1)[6]<-"original_trait"
+colnames(all_hwl1)[7]<-"at_harvest"
+all_hwl2<-melt(all_hwl1, id.vars=c("year","experiment","genotype","treatment","subplot_id","original_trait"), measure.vars=c("at_harvest","per_DAS"), variable.name="timing", value.name="data")
+all_hwl2$trait<-paste(all_hwl2$original_trait, all_hwl2$timing, sep="_")
+
+#trim the fat 
+all_hwl2<-all_hwl2[,c(1:5,9,8)]
+
+
+
+
+
 
 #########STACK##########
-all_stack<-rbind(all_pe, all_hwl, all_hts)
+all_stack<-rbind(all_pe, all_hwl2, all_mr, all_hts)
 
 #fix these errant genotypes (either no data or data cannot be attributed to actual observations)
 #BLANK
@@ -341,10 +374,10 @@ ggplot(all_stack, aes(x=treatment, y=data, fill=treatment))+
 
 ######PRODUCT######
 
-save(all_stack, file="../data/harvest_phenotypes_clean.Rdata")
+save(all_stack, file="../data_wrangle/plant_level/data/harvest_phenotypes_clean.Rdata")
 
 
-write.csv(all_stack, file="../data/harvest_phenotypes_clean.csv", row.names=FALSE)
+
 
 
 

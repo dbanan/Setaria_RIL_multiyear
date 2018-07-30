@@ -9,14 +9,16 @@
 
 
 #load object with cleaned plant_level data 
-load("../data/harvest_phenotypes_clean.Rdata")
+load("../data_wrangle/plant_level/data/harvest_phenotypes_clean.Rdata")
 
 
 
 
 #sort traits into groups for closer look  
 counts<-c("branch_number", "tiller_number", "leaf_number", "panicle_number")
-mass<-c("leaf_mass","panicle_mass","stem_mass","vegetative_mass","total_mass","reproductive_vegetative_mass_ratio")
+mass<-c("leaf_mass_at_harvest","panicle_mass_at_harvest","stem_mass_at_harvest","vegetative_mass_at_harvest","total_mass_at_harvest",
+        "leaf_mass_per_DAS","panicle_mass_per_DAS","stem_mass_per_DAS","vegetative_mass_per_DAS","total_mass_per_DAS")
+ratio<-c("reproductive_vegetative_mass_ratio","leaf_mass_ratio")
 size<-c("culm_height", "tiller_height", "basal_circumference")
 devo<-c("panicle_emergence_DAS", "dead_percent", "green_percent", "leaf_number_dead", "leaf_number_green")
 
@@ -26,6 +28,11 @@ ggplot(subset(all_stack[-which(all_stack$treatment=='sparse'),], trait %in% coun
   facet_wrap(~trait+year, scales="free")+theme_classic()+labs(title="raw")
 
 ggplot(subset(all_stack[-which(all_stack$treatment=='sparse'),], trait %in% mass), aes(x=data))+
+  geom_density(aes(group=treatment, color=treatment))+
+  scale_color_manual(values=c("red", "orange", "purple", "blue"))+
+  facet_wrap(~trait+year, scales="free")+theme_classic()+labs(title="raw")
+
+ggplot(subset(all_stack[-which(all_stack$treatment=='sparse'),], trait %in% ratio), aes(x=data))+
   geom_density(aes(group=treatment, color=treatment))+
   scale_color_manual(values=c("red", "orange", "purple", "blue"))+
   facet_wrap(~trait+year, scales="free")+theme_classic()+labs(title="raw")
@@ -85,7 +92,7 @@ all_stack2<-rbind(all_counts_trans1, all_stack)
 
 
 #transformed r object for merge with megadataset and further dataset 
-save(all_stack2, file="../data/harvest_phenotypes_clean_transformed.Rdata")
+save(all_stack2, file="../data_wrangle/plant_level/data/harvest_phenotypes_clean_transformed.Rdata")
 
 
 
