@@ -1,19 +1,14 @@
 #Setaria_BLUP_calculation.R 
 
 
-
-
-
 library(ggplot2)
 library(lme4)
 library(nlme)
 
+#read in data
+load("../data_wrangle/plant_level/data/harvest_phenotypes_clean_transformed.Rdata")
 
-#need a better way of getting r object into working environment (regardless of user/machine)
-#write a function later?
-load("/de/github/dbanan/auth/Setaria_RIL_multiyear/data_wrangle/plant_level/data/harvest_phenotypes_clean_transformed.Rdata")
-
-
+#pull out parent data to use for linear modeling
 parent.data=all_stack2[which(all_stack2$genotype %in% c('A10','B100')),]
 parent.data$environment=paste(parent.data$experiment,parent.data$year, sep='_')
 for (i in 1:nrow(parent.data)){
@@ -53,7 +48,7 @@ dev.off()
 all<-all_stack2
 
 #change 2013 dry to wet 
-all$treatment[all$year==2013 & all$treatment=="dry"]<-"wet"
+all$treatment[which(all$year==2013 & all$treatment=="dry")]<-"wet"
 
 
 #make environment column
