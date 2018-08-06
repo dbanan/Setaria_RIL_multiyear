@@ -9,8 +9,8 @@ library(reshape2)
 load("../data_wrangle/leaf_level/leaf_phenotypes_clean.Rdata")
 
 #change "genotype" and "trait" from factor to character
-leaf$genotype<-as.character(as.factor(leaf$genotype))
-leaf$trait<-as.character(as.factor(leaf$trait))
+leaf$genotype<-as.character(leaf$genotype)
+leaf$trait<-as.character(leaf$trait)
 table(leaf$year)
 table(leaf$experiment)
 table(leaf$treatment)
