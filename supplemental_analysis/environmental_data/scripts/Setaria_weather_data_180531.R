@@ -20,10 +20,9 @@ library(gridExtra)
 library(grid)
 
 
-setwd("/de/github/dbanan/auth/Setaria_weather_irrigation")
 
-save.image("./scripts/Setaria_weather_irrigation.Rdata") 
 load("./scripts/Setaria_weather_irrigation.Rdata")
+
 
 ######EXPERIMENT EVENTS########
 event_13DN<-data.frame(day=as.Date(c("2013-05-03", "2013-05-14", "2013-07-29", "2013-08-13")), 
