@@ -21,6 +21,12 @@
 #day length (NOAA, Naval observatory)
 
 
+
+
+
+#####SOIL MOISTURE#####
+load("./results/sm_data.Rdata")
+
 #####IRRIGATION######
 #2015
 irr_15DR<-read.csv("./data/Setaria_2015_irrigation.csv", header=T, stringsAsFactors=FALSE)
@@ -111,8 +117,8 @@ daylength<-daylength[,c(1,6,7,8)]
 
 ######SoyFACE######
 #infile 24 hour data
-ave24header<-read.csv("/rsync/box/Setaria/Weather Data/2016 SoyFACE weather data/24hr_weather_16sept2016.csv", skip=1, header=F, nrows=1, as.is=T)
-ave24<-read.csv("/rsync/box/Setaria/Weather Data/2016 SoyFACE weather data/24hr_weather_16sept2016.csv", header=F, skip=4)
+ave24header<-read.csv("./data/24hr_weather_16sept2016.csv", skip=1, header=F, nrows=1, as.is=T)
+ave24<-read.csv("./data/24hr_weather_16sept2016.csv", header=F, skip=4)
 colnames(ave24)<-ave24header
 #convert timestamp format to julian
 #ave24$calendar<-as.Date(ave24$TIMESTAMP)
@@ -219,13 +225,13 @@ dry15<-weather15DR
 wet15<-weather15DR
 
 #add environment columns 
-thick13$environment<-"thick_13"
-dry13$environment<-"dry_13"
-thick14$environment<-"thick_14"
-dry14$environment<-"dry_14"
-wet14$environment<-"wet_14"
-dry15$environment<-"dry_15"
-wet15$environment<-"wet_15"
+thick13$environment<-"thick_2013"
+dry13$environment<-"dry_2013"
+thick14$environment<-"thick_2014"
+dry14$environment<-"dry_2014"
+wet14$environment<-"wet_2014"
+dry15$environment<-"dry_2015"
+wet15$environment<-"wet_2015"
 
 
 
@@ -235,7 +241,7 @@ thick13$applied_mm<-thick13$isws_precip
 dry13$applied_mm<-0
 thick14$applied_mm<-thick14$isws_precip
 dry14$applied_mm<-0
-wet14$applied_mm<-NA #still need to find irrigation records for 2014 Drought experiment 
+wet14$applied_mm<-wet14$isws_precip #still need to find irrigation records for 2014 Drought experiment, use background precip for now
 dry15$applied_mm<-0
 #wet15 already merged in 
 
@@ -247,9 +253,19 @@ weather_all<-rbind(thick13, dry13, thick14, dry14, wet14, dry15, wet15)
 weather_all$applied_mm[is.na(weather_all$applied_mm)]<-0
 
 
+#convert dates to DAS 
+weather_all$sowing[weather_all$environment=="thick_2013"]<-123
+weather_all$sowing[weather_all$environment=="dry_2013"]<-188
+weather_all$sowing[weather_all$environment=="thick_2014"]<-198
+weather_all$sowing[weather_all$environment=="dry_2014"]<-159
+weather_all$sowing[weather_all$environment=="wet_2014"]<-159
+weather_all$sowing[weather_all$environment=="dry_2015"]<-187
+weather_all$sowing[weather_all$environment=="wet_2015"]<-187
 
+weather_all$DAS<-weather_all$DOY-weather_all$sowing
 
-
+#join with soil moisture data
+weather_all<-join(weather_all, sm_all)
 
 
 
@@ -261,7 +277,7 @@ weather_all$applied_mm[is.na(weather_all$applied_mm)]<-0
 weather_all$PPET<-weather_all$applied_mm-weather_all$isws_PET
 
 
-#calculate 7 day running averages on "applied_mm" and "PPET"
+#calculate 7 day running averages on "applied_mm" and "PPET" and soil moisture 
 f7<-rep(1/7, 7)
 
 running_PPET<-as.data.frame(filter(weather_all$PPET, f7, sides=2))
@@ -272,9 +288,20 @@ running_precip<-as.data.frame(filter(weather_all$applied_mm, f7, sides=2))
 colnames(running_precip)<-"running_precip"
 running_precip$running_precip[is.na(running_precip$running_precip)]<-0
 
+running_top<-as.data.frame(filter(weather_all$top, f7, side=2))
+colnames(running_top)<-"running_top"
+running_top$running_top[is.na(running_top$running_top)]<-0
+
+running_middle<-as.data.frame(filter(weather_all$middle, f7, side=2))
+colnames(running_middle)<-"running_middle"
+running_middle$running_middle[is.na(running_middle$running_middle)]<-0
+
+running_bottom<-as.data.frame(filter(weather_all$bottom, f7, side=2))
+colnames(running_bottom)<-"running_bottom"
+running_bottom$running_bottom[is.na(running_bottom$running_bottom)]<-0
 
 #join with the other traits 
-weather_all<-cbind(weather_all, running_PPET, running_precip)
+weather_all<-cbind(weather_all, running_PPET, running_precip, running_top, running_middle, running_bottom)
 
 
 
