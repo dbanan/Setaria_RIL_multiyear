@@ -323,7 +323,8 @@ all_hwl<-melt(all_hww, id.vars=c("year","experiment","genotype","treatment","sub
 #subset mass ratio data (mr), pull out reproductive_vegatative_mass_ratio and leaf_mass_ratio prior to calculating mass per harvest DAS
 all_mr<-subset(all_hwl, trait %in% c("reproductive_vegetative_mass_ratio", "leaf_mass_ratio"))
 
-
+#quick visualization
+ggplot()+geom_boxplot(data=all_hwl, aes(factor(treatment), data, fill=factor(treatment)))+facet_wrap(~trait+year, scales="free")
 
 
 
