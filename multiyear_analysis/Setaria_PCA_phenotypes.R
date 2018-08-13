@@ -105,6 +105,10 @@ biplot(pca_DAS)
 
 pca_DAS_table<-rbind(pca_DAS$rotation, pca_DAS$sdev)
 
+#output PC values 
+pca_DAS_x<-pca_DAS$x
+
+
 #visualize
 ggbiplot(pca_DAS, choices=c(1,2),labels.size = 2,obs.scale=1,varname.adjust = 1, var.scale=1, groups=env, ellipse=TRUE)
 ggbiplot(pca_DAS, choices=c(1,3),labels.size = 2,obs.scale=1,varname.adjust = 1, var.scale=1, groups=env, ellipse=TRUE)
