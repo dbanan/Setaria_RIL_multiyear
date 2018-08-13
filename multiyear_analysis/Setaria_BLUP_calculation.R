@@ -74,6 +74,7 @@ all$plot=factor(all$plot)
 
 #what are our environments? 
 unique(all$environment)
+levels(all$environment)
 #calculating blups for parents
 {
 exp.combos=c("density_2013","density_2014","drought_2014","drought_2015")
@@ -139,6 +140,7 @@ for(k in 1:length(traits)){
   }
 dev.off()
 
+pdf('./results/Set_RIL_field_data_summary_boxplots_BLUPS.pdf', height = 12, width = 14)
 ggplot(rils.blups, aes(x=year, y=predicted, group=interaction(year,ordered(treatment, levels=c('wet','dry','thick','sparse'))), fill=treatment))+
   geom_boxplot()+
   scale_fill_manual(values=c('red', 'goldenrod1', 'mediumorchid4', 'dodgerblue'))+
@@ -150,8 +152,12 @@ ggplot(rils.blups[-which(rils.blups$treatment=='sparse'),], aes(x=year, y=predic
   scale_fill_manual(values=c('red', 'mediumorchid4', 'dodgerblue'))+
   facet_wrap(~trait, scale="free")+
   theme_classic()+xlab(label = NULL)+ylab(label = NULL)
+dev.off()
 
 ######PRODUCT#####
 #output BLUP values for further analysis 
 save(rils.blups, file="RIL_BLUP.Rdata")
+
+blup_wide<-dcast(rils.blups, year+experiment+genotype+treatment~trait, value.var="predicted", mean)
+write.csv(blup_wide, './results/Set_RIL_field_data_BLUPS_wide.csv', row.names = F)
 ##END##
