@@ -124,7 +124,8 @@ biplot(pca_DAS)
 pca_DAS_table<-rbind(pca_DAS$rotation, pca_DAS$sdev)
 
 #output PC values 
-pca_DAS_x<-pca_DAS$x
+pca_DAS_x<-as.data.frame(cbind(name=rownames(pca_DAS$x), pca_DAS$x))
+save(pca_DAS_x, file="./pheno_PCA_predictions.Rdata")
 
 
 #visualize
