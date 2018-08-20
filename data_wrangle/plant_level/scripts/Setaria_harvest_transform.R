@@ -9,10 +9,7 @@
 
 
 #load object with cleaned plant_level data 
-load("../data_wrangle/plant_level/data/harvest_phenotypes_clean.Rdata")
-
-
-
+load("../data/harvest_phenotypes_clean.Rdata")
 
 #sort traits into groups for closer look  
 counts<-c("branch_number", "tiller_number", "leaf_number", "panicle_number")
@@ -48,12 +45,12 @@ ggplot(subset(all_stack[-which(all_stack$treatment=='sparse'),], trait %in% size
   facet_wrap(~trait+year, scales="free")+theme_classic()+labs(title="raw")
 
 ##transformations 
-all_stack1<-all_stack
+all_stack1<-all_stack.trimmed
 
 #square root, cube root, log transform 
-all_stack1$sqrt<-sqrt(all_stack1$data)
-all_stack1$cbrt<-(all_stack1$data)^(1/3)
-all_stack1$log<-log(all_stack1$data)
+all_stack1$sqrt<-sqrt(all_stack1$value)
+all_stack1$cbrt<-(all_stack1$value)^(1/3)
+all_stack1$log<-log(all_stack1$value)
 
 #compare distributions 
 ggplot(subset(all_stack1[-which(all_stack1$treatment=='sparse'),], trait %in% counts), aes(x=sqrt))+
@@ -71,32 +68,16 @@ ggplot(subset(all_stack1[-which(all_stack1$treatment=='sparse'),], trait %in% co
   scale_color_manual(values=c("red", "orange", "purple", "blue"))+
   facet_wrap(~trait+year, scales="free")+theme_classic()+labs(title="log")
 
-
-
-
 #looks like cube root is the way to go for counts, replace raw count data with cube root transformed values 
 all_counts_trans<-subset(all_stack1, trait %in% counts)
 all_counts_trans1<-all_counts_trans[,c(1:6,9)]
-colnames(all_counts_trans1)[7]<-"data"
+colnames(all_counts_trans1)[7]<-"value"
 all_counts_trans1$new_trait<-paste(all_counts_trans1$trait, "cbrt", sep="_")
 all_counts_trans1<-all_counts_trans1[,c(1:5,7,8)]
 colnames(all_counts_trans1)[7]<-"trait"
 
-
-
-
-#stack transformed and original dataset 
-all_stack2<-rbind(all_counts_trans1, all_stack)
-
-
-
+#combining transformed and original dataset 
+all_stack2<-rbind(all_counts_trans1, all_stack.trimmed)
 
 #transformed r object for merge with megadataset and further dataset 
-save(all_stack2, file="../data_wrangle/plant_level/data/harvest_phenotypes_clean_transformed.Rdata")
-
-
-
-
-
-
-
+save(all_stack2, file="../data/harvest_phenotypes_clean_transformed.Rdata")
