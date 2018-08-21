@@ -105,12 +105,13 @@ for(d in 1:length(exp.combos)){
   traits=levels(temp$trait)
   pdf(paste('./results/',exp.combos[d],'_rilblups.pdf', sep=""))
   for(k in 1:length(traits)){
+    timestamp()
     print(c(exp.combos[d],traits[k]))
     ril.data=temp[which(temp$trait==traits[k]),]
     if (nrow(ril.data)==0){
       next
     }
-    model=lmer(data ~ (1|genotype) + treatment + plot %in% treatment, data=ril.data)
+    model=lmer(value ~ (1|genotype) + treatment + plot %in% treatment, data=ril.data)
     ril.data=ril.data[complete.cases(ril.data),]
     ril.data$predicted=predict(model)
     boxplot(ril.data$predicted~ril.data$treatment+ril.data$genotype, xlab=paste(exp.combos[d],'model',sep='.'), ylab=traits[k])
@@ -130,7 +131,7 @@ for(k in 1:length(traits)){
   if (nrow(ril.data)==0){
     next
   }
-  model=lmer(data ~ (1|genotype) + plot , data=ril.data)
+  model=lmer(value ~ (1|genotype) + plot , data=ril.data)
   ril.data=ril.data[complete.cases(ril.data),]
   ril.data$predicted=predict(model)
   boxplot(ril.data$predicted~ril.data$genotype, xlab=paste(exp.combos[d],'model',sep='.'), ylab=traits[k])
