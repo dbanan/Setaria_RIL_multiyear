@@ -248,7 +248,7 @@ dry15$applied_mm<-0
 
 
 #stack individual environments 
-weather_all<-rbind(thick13, dry13, thick14, dry14, wet14, dry15, wet15)
+weather_all<-rbind(dry13, dry14, dry15, thick13, thick14, wet14, wet15)
 
 weather_all$applied_mm[is.na(weather_all$applied_mm)]<-0
 
@@ -267,6 +267,7 @@ weather_all$DAS<-weather_all$DOY-weather_all$sowing
 #join with soil moisture data
 weather_all<-join(weather_all, sm_all)
 
+rownames(weather_all)<-paste(weather_all$environment, weather_all$DAS, sep="_")
 
 
 #####RUNNING#####
@@ -288,7 +289,7 @@ running_precip<-as.data.frame(filter(weather_all$applied_mm, f7, sides=2))
 colnames(running_precip)<-"running_precip"
 running_precip$running_precip[is.na(running_precip$running_precip)]<-0
 
-running_top<-as.data.frame(filter(weather_all$top, f7, side=2))
+running_top<-as.data.frame(filter(weather_all$top, f7, sides=2))
 colnames(running_top)<-"running_top"
 running_top$running_top[is.na(running_top$running_top)]<-0
 
