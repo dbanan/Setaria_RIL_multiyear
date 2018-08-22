@@ -19,7 +19,7 @@ weatherl<-melt(weather_all, id.vars=c("environment", "DAS"),
 
 #environment averages 
 envavg<-ddply(weatherl, c("environment","variable"), summarise, 
-              avg=mean(data), stderr = sd(data) / sqrt((length(data))))
+              avg=mean(data), stderr = sd(data) / sqrt((length(data))), total=sum(data))
 
 
 #boxplot
