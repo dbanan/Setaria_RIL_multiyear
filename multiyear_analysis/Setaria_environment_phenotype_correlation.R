@@ -18,7 +18,7 @@ load("./pheno_PCA_predictions.Rdata")
 
 ##########RANK ORDER PCA###########
 #rank order PC
-pheno_pred<-pca_DAS_x
+pheno_pred<-pca_multiyear_x
 
 pheno_pred$PC1<-as.numeric(as.character(pheno_pred$PC1))
 pheno_pred$PC2<-as.numeric(as.character(pheno_pred$PC2))
@@ -37,11 +37,11 @@ pheno_predl1<-pheno_predl[-which(pheno_predl$geno %in% c("A10","B100")),]
 pheno_predl2<-subset(pheno_predl, geno %in% c("A10", "B100"))
 
 pheno_predl1$genotype<-paste(pheno_predl1$geno, pheno_predl1$id, sep="_")
-pheno_predl1$environment<-paste(pheno_predl1$treatment, pheno_predl1$year, sep="_")
+pheno_predl1$environment<-paste(pheno_predl1$experiment, pheno_predl1$year, sep="_")
 pheno_predl1<-pheno_predl1[,c(8,9,6,7)]
 
 pheno_predl2$genotype<-pheno_predl2$geno
-pheno_predl2$environment<-paste(pheno_predl2$year, pheno_predl2$experiment, sep="_")
+pheno_predl2$environment<-paste(pheno_predl2$id, pheno_predl2$experiment, sep="_")
 pheno_predl2<-pheno_predl2[,c(8,9,6,7)]
 
 pheno_predl3<-rbind(pheno_predl2, pheno_predl1)
