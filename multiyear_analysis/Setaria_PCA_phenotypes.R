@@ -1,5 +1,7 @@
 #Setaria_PCA_phenotypes.R 
 
+
+
 #6/12/18
 #migrate analysis from May data meeting 
 #6/26/18
@@ -126,9 +128,6 @@ biplot(pca_DAS)
 
 pca_DAS_table<-rbind(pca_DAS$rotation, pca_DAS$sdev)
 
-#output PC values 
-pca_DAS_x<-as.data.frame(cbind(name=rownames(pca_DAS$x), pca_DAS$x))
-save(pca_DAS_x, file="./pheno_PCA_predictions.Rdata")
 
 
 #visualize
@@ -226,6 +225,10 @@ biplot(PCA_multiyear)
 PCA_multiyear_table<-rbind(PCA_multiyear$rotation, PCA_multiyear$sdev)
 write.csv(PCA_multiyear_table, file = './results/PCA_multiyear_trait_eigenvalues.csv')
 
+#output PC predictions
+pca_multiyear_x<-as.data.frame(cbind(name=rownames(PCA_multiyear$x), PCA_multiyear$x))
+save(pca_multiyear_x, file="./pheno_PCA_predictions.Rdata")
+
 #visualize
 ggbiplot(PCA_multiyear, choices=c(1,2),labels.size = 2,obs.scale=1,varname.adjust = 1, var.scale=1, groups=env, ellipse=TRUE)
 ggbiplot(PCA_multiyear, choices=c(1,3),labels.size = 2,obs.scale=1,varname.adjust = 1, var.scale=1, groups=env, ellipse=TRUE)
@@ -241,6 +244,9 @@ dev.off()
 png("./results/PC23_21aug18.png", width=900, height=700)
 ggbiplot(PCA_multiyear, choices=c(2,3),labels.size = 2,obs.scale=1,varname.adjust = 1, var.scale=1, groups=env, ellipse=TRUE)
 dev.off()
+
+
+
 
 #----------------------------------------------------------------------------------------------------------#
 
