@@ -13,7 +13,8 @@ library(ggsignif)
 install.packages("rstatix")
 library(rstatix)
 
-
+install.packages("ggrepel")
+library(ggrepel)
 
 if(!require(devtools)) install.packages("devtools")
 devtools::install_github("kassambara/ggpubr")
@@ -25,7 +26,7 @@ library(rstatix)
 
 library(dplyr)
 library(ggplot2)
-
+library(plyr)
 
 #statistics, run mixed model on 7 different environments for each trait
 
@@ -38,9 +39,18 @@ library(ggplot2)
 ####Data prep####
 #load BLUPs
 load("RIL_BLUP.Rdata")
+
+#change year to numeric 
+rils.blups$year<-as.numeric(as.character(rils.blups$year))
+rils.blups$treatment<-as.character(rils.blups$treatment)
+rils.blups$environment<-paste(rils.blups$treatment, rils.blups$year, sep="_")
+
 #just on removing low density plants from the dataset 
-just_thick<-rils.blups[-which(rils.blups$treatment=="sparse"),]
+just_thick<-rils.blups[-which(rils.blups$year==2013 | rils.blups$treatment=="sparse"),]
 table(just_thick$year)
+table(just_thick$treatment)
+
+
 
 #lists for just common traits (version for many environments but few traits; few environments but many traits)
 trait.matrix=as.data.frame.array(table(just_thick$trait,just_thick$environment))
@@ -85,21 +95,54 @@ dev.off()
 
 
 
-is_outlier <- function(x) {
-  return(x < quantile(x, 0.25) - 1.5 * IQR(x) | x > quantile(x, 0.75) + 1.5 * IQR(x))
-}
 
 
-  ggplot(common_geno, aes(x=environment, y=value))+
+
+#calculate quartiles and generate quartile table (trait*environment)                           
+quant<-(aggregate(value~trait+environment, data=common_geno, FUN=fivenum))
+values<-as.data.frame(quant$value)
+colnames(values)<-c("min","Q1","median","Q3","max")
+#calculate IQR and outliers 
+values$IQR<-values$Q3-values$Q1
+values$out_upper<-values$Q3+values$IQR*1.5
+values$out_lower<-values$Q1-values$IQR*1.5
+
+headers<-quant[,c(1,2)]
+quantiles<-cbind(headers, values)
+quantiles$trait<-as.character(quantiles$trait)
+
+
+#merge with data 
+common1<-merge(common_geno, quantiles, by=c("trait","environment"))
+
+#identify outlier observations 
+common1$outlier[common1$value>common1$out_upper | common1$value<common1$out_lower]<-common1$genotype
+
+#boxplots with outliers labeled 
+
+ggplot(common1, aes(x=environment, y=value))+
   geom_boxplot(aes(fill=environment))+
+  geom_text_repel(aes(label=outlier), na.rm=TRUE)+
+  facet_wrap(~trait, scale="free")+
+  theme_classic()+xlab(label = NULL)+ylab(label = NULL)+
+  theme(rect = element_rect(fill = "transparent"))
+
+
+
+ggplot(common1, aes(x=environment, y=value))+
+  geom_boxplot(aes(color=environment))+
+  geom_line(data=subset(common1, genotype %in% interest), aes(group=genotype, linetype=genotype))+
+  stat_summary(fun.y=mean, color="red", geom="point")+
+  #geom_text_repel(data=subset(common1, genotype %in% interest), aes(label=genotype))+
   facet_wrap(~trait, scale="free")
   
-                      
 
-                           
-quant<-as.data.frame(aggregate(value~trait+environment, data=common_geno, FUN=fivenum))
+
   
-common_geno1<-join(common_geno, quant, type="full", match="all")
+interest<-c("A10","B100","RIL_170","RIL_033","RIL_118")
+
+
+
 
 
 
@@ -134,8 +177,8 @@ cld(leastsquare,
 
 
 #make significance group key for plotting
-environment<-c("thick_2014","thick_2013","dry_2014","dry_2013","dry_2015","wet_2014","wet_2015")
-abc<-c("a","a","a","ab","ab","bc","c")
+environment<-c("thick_2014","dry_2014","dry_2015","wet_2014","wet_2015")
+abc<-c("a","a","a","b","c")
 abc_group<-data.frame(environment,abc)
 
 
@@ -145,6 +188,12 @@ ggplot(data=just_height, aes(x=environment, y=value))+
   stat_summary(fun.y=mean, color="red", geom="point")+
   geom_text(data=abc_group, aes(label=abc, y=900))
 dev.off()
+
+
+
+
+
+#loop this method through the whole trait set 
 
 
 
