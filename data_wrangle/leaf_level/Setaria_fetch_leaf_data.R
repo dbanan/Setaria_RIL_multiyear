@@ -1,11 +1,12 @@
 #Setaria_fetch_leaf_data.R 
-
+library(tidyverse)
 #load "step_2" leaf data, do any necessary cleaning, formatting before data merge. 
 
 #re-running with newest data version 
-load("../data_wrangle/leaf_level/Set_RIL_field_leaf_level_subplot_data.Rdata")
+load("Set_RIL_field_leaf_level_subplot_data.Rdata")
 
 table(leaf.level$genotype)
+leaf.level%>% group_by(exp, genotype, subplot_id, trait)%>%summarize(leaf.level, n())
 #still have some errant genotype names
 leaf.level$genotype[leaf.level$genotype==" A10"]<-"A10"
 leaf.level$genotype[leaf.level$genotype==" B100"]<-"B100"
@@ -24,7 +25,7 @@ for(i in 1:length(trait.list)){
   rm(temp)
 }
 #removing extreme value for CN_ratio
-leaf.level$data[which(leaf.level$trait=='sim_CN_ratio' & leaf.level$data >60)]=NA
+leaf.level$data[which(leaf.level$trait=='CN_ratio' & leaf.level$data >60)]=NA
 
 for(i in 1:length(trait.list)){
   temp=leaf.level[which(leaf.level$trait == trait.list[i]),]
@@ -58,8 +59,8 @@ for(i in 1:nrow(leaf.level)){
   }
 }
 table(leaf.level$treatment)
-leaf=leaf.level[,c(1:6,8)]
+leaf=leaf.level
 #output and ready for merge 
-save(leaf, file="../data_wrangle/leaf_level/leaf_phenotypes_clean.Rdata")
+save(leaf, file="leaf_phenotypes_clean.Rdata")
 
 ##END##

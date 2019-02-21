@@ -1,5 +1,5 @@
 #leaf level trait correlations across environments
-library(plyr);library(reshape2);library(ggplot2)
+library(tidyverse)
 load('RIL_BLUP.Rdata')
 levels(rils.blups$trait)
 leaf=rils.blups[which(rils.blups$trait %in% c("lfblade_area","lfblade_length","lfblade_width",                    
@@ -32,7 +32,7 @@ pairs(leaf.wide2[,c(5:12,16,19)], col=cols)
 pairs(leaf.wide2[,c(5:12,16,20)], col=cols)
 pairs(leaf.wide2[,c(5:12,16,21)], col=cols)
 pairs(leaf.wide2[,c(5:12,16,22)], col=cols)
-pairs(leaf.wide2[,c(5:8,:22)], col=cols)
+pairs(leaf.wide2[,c(5:8,22)], col=cols)
 
 leaf.pca=prcomp()
 

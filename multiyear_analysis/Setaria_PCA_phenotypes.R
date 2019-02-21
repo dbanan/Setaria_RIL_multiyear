@@ -4,12 +4,11 @@
 #migrate analysis from May data meeting 
 #6/26/18
 #now on git, this script (fingers crossed) should run smoothly from the BLUP calculation output 
-library(tidyverse)
-library(GGally)
-#library(plyr)
-#library(reshape2)
 library(FactoMineR)
 library(ggbiplot)
+library(tidyverse)
+library(GGally)
+
 ####Data prep####
 #load BLUPs
 load("RIL_BLUP.Rdata")
@@ -19,6 +18,7 @@ table(just_thick$year)
 
 #lists for just common traits (version for many environments but few traits; few environments but many traits)
 trait.matrix=as.data.frame.array(table(just_thick$trait,just_thick$environment))
+trait.matrix2=trait.matrix
 trait.check=apply(trait.matrix,1,function(i) any(i == 0))
 common=names(which(trait.check ==F))
 just_common<-subset(just_thick, trait %in% common)
@@ -35,7 +35,7 @@ common_geno=subset(geno_means, genotype %in% common.geno)
 
 #outputting boxplots of common traits for common genotypes across environments
 png('./results/Set_RIL_field_common_traits_common_genos_summary_boxplots.png',width=900, height=700)
-ggplot(common_geno, aes(x=year, y=value, group=interaction(year,ordered(treatment, levels=c('wet','dry','thick','sparse'))), fill=treatment))+
+ggplot(common_geno[c(5:10,23,21,11:15)], aes(x=year, y=value, group=interaction(year,ordered(treatment, levels=c('wet','dry','thick','sparse'))), fill=treatment))+
   geom_boxplot()+
   scale_fill_manual(values=c('red', 'mediumorchid4', 'dodgerblue'))+
   facet_wrap(~trait, scale="free")+
@@ -217,6 +217,7 @@ PCA_multiyear<-prcomp(pca.matrix2, center=TRUE, scale.=TRUE)
 PCA_multiyear$sdev
 PCA_multiyear$rotation
 PCA_multiyear$x
+geno.eigenvalues=PCA_multiyear$x
 plot(PCA_multiyear)
 plot(PCA_multiyear, type="l")
 
@@ -233,21 +234,80 @@ ggbiplot(PCA_multiyear, choices=c(2,3),labels.size = 2,obs.scale=1,varname.adjus
 ggbiplot(PCA_multiyear, choices=c(1,4),labels.size = 2,obs.scale=1,varname.adjust = 1, var.scale=1, groups=env, ellipse=TRUE)
 
 png("./results/PC12_21aug18.png", width=900, height=700)
-ggbiplot(PCA_multiyear, choices=c(1,2),labels.size = 2,obs.scale=1,varname.adjust = 1, var.scale=1, groups=env, ellipse=TRUE)
+ggbiplot(PCA_multiyear, choices=c(1,2),labels.size = 2,obs.scale=1,varname.adjust = 1, var.scale=1, groups=env, ellipse=TRUE)+
+  theme_bw()
 dev.off()
 png("./results/PC13_21aug18.png", width=900, height=700)
-ggbiplot(PCA_multiyear, choices=c(1,3),labels.size = 2,obs.scale=1,varname.adjust = 1, var.scale=1, groups=env, ellipse=TRUE)
+ggbiplot(PCA_multiyear, choices=c(1,3),labels.size = 2,obs.scale=1,varname.adjust = 1, var.scale=1, groups=env, ellipse=TRUE)+
+  theme_bw()
 dev.off()
 png("./results/PC23_21aug18.png", width=900, height=700)
-ggbiplot(PCA_multiyear, choices=c(2,3),labels.size = 2,obs.scale=1,varname.adjust = 1, var.scale=1, groups=env, ellipse=TRUE)
+ggbiplot(PCA_multiyear, choices=c(2,3),labels.size = 2,obs.scale=1,varname.adjust = 1, var.scale=1, groups=env, ellipse=TRUE)+
+  theme_bw()
 dev.off()
 
+#PCA with limited harvest masses and no mass ratios
+colnames(common.wide.complete)
+pca.matrix.limited=as.matrix(common.wide.complete[,c(5:11,14,23)])
+#pca.matrix2=common.wide.complete[,c(5:10,16:21,23)]
+colnames(pca.matrix.limited)
+rownames(pca.matrix.limited)=paste(common.wide.complete$genotype, common.wide.complete$environment, sep="_")
+
+PCA_limited<-prcomp(pca.matrix.limited, center=TRUE, scale.=TRUE)
+
+PCA_limited$sdev
+PCA_limited$rotation
+PCA_limited$x
+geno.eigenvalues=as.matrix(PCA_limited$x)
+plot(PCA_limited)
+plot(PCA_limited, type="l")
+
+plot(PCA_limited$x[,1:2])
+biplot(PCA_limited)
+
+PCA_limited_table<-rbind(PCA_limited$rotation, PCA_limited$sdev)
+write.csv(PCA_limited_table, file = './results/PCA_multiyear_limited_trait_eigenvalues.csv')
+
+#visualize
+ggbiplot(PCA_limited, choices=c(1,2),labels.size = 2,obs.scale=1,varname.adjust = 1, var.scale=1, groups=env, ellipse=TRUE)
+ggbiplot(PCA_limited, choices=c(1,3),labels.size = 2,obs.scale=1,varname.adjust = 1, var.scale=1, groups=env, ellipse=TRUE)
+ggbiplot(PCA_limited, choices=c(2,3),labels.size = 2,obs.scale=1,varname.adjust = 1, var.scale=1, groups=env, ellipse=TRUE)
+ggbiplot(PCA_limited, choices=c(1,4),labels.size = 2,obs.scale=1,varname.adjust = 1, var.scale=1, groups=env, ellipse=TRUE)
+
+png("./results/PC12_limited.png", width=900, height=700)
+ggbiplot(PCA_limited, choices=c(1,2),labels.size = 2,obs.scale=1,varname.adjust = 1, var.scale=1, groups=env, ellipse=TRUE)+
+  theme_bw()
+dev.off()
+png("./results/PC13_limited.png", width=900, height=700)
+ggbiplot(PCA_limited, choices=c(1,3),labels.size = 2,obs.scale=1,varname.adjust = 1, var.scale=1, groups=env, ellipse=TRUE)+
+  theme_bw()
+dev.off()
+png("./results/PC23_limited.png", width=900, height=700)
+ggbiplot(PCA_limited, choices=c(2,3),labels.size = 2,obs.scale=1,varname.adjust = 1, var.scale=1, groups=env, ellipse=TRUE)+
+  theme_bw()
+dev.off()
 #----------------------------------------------------------------------------------------------------------#
+common.wide.complete$PC1=geno.eigenvalues[,1]
+common.wide.complete$PC2=geno.eigenvalues[,2]
+common.wide.complete$PC3=geno.eigenvalues[,3]
+#all common traits
+common.wide.complete%>%ggpairs(columns = c(5:10,23,21,11:15),upper = list(continuous = wrap('cor', size = 2.25, alignPercent=0.75)),
+                               columnLabels = c('lf_area','lf_weight','SLA', 'd13c','tiller_#','PE_DAS','culm_height',
+                                                'R:V','veg_mass','leaf_mass','stem_mass','panicle_mass','total_mass'),
+                               ggplot2::aes(colour=environment, alpha=0.7))+theme_bw()
+#plant level and PCs
+common.wide.complete%>%ggpairs(columns = c(9,10,23,21,11:15,26:28),upper = list(continuous = wrap('cor', size = 2.25, alignPercent=0.75)),
+                               columnLabels = c('tiller_#','PE_DAS','culm_height','R:V','veg_mass',
+                                                'leaf_mass','stem_mass','panicle_mass','total_mass','PC1','PC2','PC3'),
+                               ggplot2::aes(colour=environment, alpha=0.7))+theme_bw()
+#leaf level and PCs
+common.wide.complete%>%ggpairs(columns = c(5:8,26:28),upper = list(continuous = wrap('cor', size = 2.25, alignPercent=0.75)),
+                               ggplot2::aes(colour=environment, alpha=0.7))+theme_bw()
 
 #----------------------------------------------------------------------------------------------------------#
 ####Heirarchical clustering####
 library(dendextend);library(circlize)
-hclust.matrix=common.wide.complete[,c(5:10,16:20,23)]
+hclust.matrix=as.matrix(common.wide.complete[,c(5:10,16:20,23)])
 rownames(hclust.matrix)=paste(common.wide.complete$genotype, common.wide.complete$treatment, common.wide.complete$year, sep="_")
 heir.clust=hclust(dist(hclust.matrix))
 #colors for the genotype labels on the dendrogram
@@ -268,27 +328,59 @@ labels_colors(dend)=lab.color[order.dendrogram(dend)]
 plot(dend, cex=0.5)
 circlize_dendrogram(dend,labels_track_height = NA)
 
+heatmap(hclust.matrix, scale = 'column')
 
 #### Multiple factor analysis####
 #trying something new
 colnames(common.wide.complete)
-mfa.data=common.wide.complete[,c(1,4,5:10,23,21,11:15)]
+mfa.data=common.wide.complete[,c(25,3,5:10,23,21,11:15)]
+
 colnames(mfa.data)
-try=MFA(mfa.data, group = c(2,4,3,6), type = c('n','s','s','s'), 
-        name.group = c('environment','leaf','architecture','biomass'),
-        num.group.sup=c(1))
+try=MFA(mfa.data, group = c(1,1,4,3,6), type = c('n','n','s','s','s'), 
+        name.group = c('environment','genotype','leaf','architecture','biomass'),
+        num.group.sup=c(1,2))
 barplot(try$eig[,1],main="Eigenvalues",names.arg=1:nrow(try$eig))
-plotellipses(try)
+plotellipses(try, cex=1.5)
 summary(try)
 plot(try)
 plot(try, choix = 'axes')
 plot(try, choix = 'axes', axes = c(1,3))
 plot(try, choix = 'axes', axes = c(2,3))
+
 plot(try, choix = 'group')
 plot(try, choix = 'group', axes = c(1,3))
 plot(try, choix = 'group', axes = c(2,3))
 plot(try, choix = 'ind')
-plot(try, choix = 'var')
-plot(try, choix = 'var', axes = c(1,3))
-plot(try, choix = 'var', axes = c(2,3))
+plot(try, choix = 'var', cex=0.6, autoLab = 'yes')
+plot(try, choix = 'var', axes = c(1,3), cex=0.6, autoLab = 'yes')
+plot(try, choix = 'var', axes = c(2,3), cex=0.6, autoLab = 'yes')
+###CALCULATING AND PLOTTING COEFFICIENT OF VARIATION###
+cv=function (x){
+  y=sd(x)/mean(x)
+  return(y)
+}
+geno.CV=common_geno%>%group_by(genotype, trait)%>%summarise(CoV=abs(cv(data)))
+geno.CV=geno.CV[which(geno.CV$trait %in% c('lfblade_area','lfblade_weight','SLA','d13C','tiller_number_cbrt',
+                                'panicle_emergence_DAS','vegetative_mass_at_harvest','leaf_mass_at_harvest',
+                                'stem_mass_at_harvest','panicle_mass_at_harvest','total_mass_at_harvest',
+                                'reproductive_vegetative_mass_ratio','leaf_mass_ratio','culm_height')),]
+traits=unique(geno.CV$trait)
+for(i in 1:length(traits)){
+  assign(paste(traits[i],'cvplot',sep = '.'),
+  ggplot(geno.CV[which(geno.CV$trait==traits[i]),],aes(reorder(genotype, CoV), CoV))+geom_point()+
+    theme_bw()+xlab(label = NULL)+ylab(label = NULL)+theme(axis.text.x = element_text(angle = 90))+ggtitle(traits[i])
+  )
+}
+multiplot(lfblade_area.cvplot,lfblade_weight.cvplot,SLA.cvplot,d13C.cvplot,tiller_number_cbrt.cvplot,
+          panicle_emergence_DAS.cvplot,vegetative_mass_at_harvest.cvplot,leaf_mass_at_harvest.cvplot,stem_mass_at_harvest.cvplot,
+          panicle_mass_at_harvest.cvplot,total_mass_at_harvest.cvplot,reproductive_vegetative_mass_ratio.cvplot,leaf_mass_ratio.cvplot,culm_height.cvplot, cols=4)
+ggplot(geno.CV)+geom_point(aes(reorder(genotype, CoV), CoV))+ 
+   facet_wrap(~trait)+
+   theme_bw()+xlab(label = NULL)+ylab(label = NULL)+theme(axis.text.x = element_text(angle = 90))
 
+cv.wide=geno.CV%>%spread(key=trait, value=CoV)
+
+ggpairs(upper = list(continuous = wrap('cor', size = 2.25, alignPercent=0.75)),
+                               ggplot2::aes(colour=environment, alpha=0.7))+theme_bw()
+
+   
