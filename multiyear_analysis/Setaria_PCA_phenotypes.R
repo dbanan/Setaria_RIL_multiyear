@@ -1,9 +1,9 @@
-#Setaria_PCA_phenotypes.R 
+#Setaria_PCA_phenotypes.R
 
 #6/12/18
-#migrate analysis from May data meeting 
+#migrate analysis from May data meeting
 #6/26/18
-#now on git, this script (fingers crossed) should run smoothly from the BLUP calculation output 
+#now on git, this script (fingers crossed) should run smoothly from the BLUP calculation output
 library(FactoMineR)
 library(ggbiplot)
 library(tidyverse)
@@ -12,7 +12,7 @@ library(GGally)
 ####Data prep####
 #load BLUPs
 load("RIL_BLUP.Rdata")
-#just on removing low density plants from the dataset 
+#just on removing low density plants from the dataset
 just_thick<-rils.blups[-which(rils.blups$treatment=="sparse"),]
 table(just_thick$year)
 
@@ -50,12 +50,12 @@ common_wide$environment=paste(common_wide$treatment,common_wide$year, sep="_")
 common.wide.complete<-common_wide[complete.cases(common_wide),]
 colnames(common.wide.complete)
 save(common.wide.complete, file = 'Set_multiyear_common_traits_geno_means.Rdata')
-#pull out environment column 
+#pull out environment column
 env<-common.wide.complete$environment
 geno=common.wide.complete$genotype
 
 ####PCA BLUP######
-#PCA run throughs to get decide the appropriate traits to include and which way to report plant biomass
+#PCA run throughs to decide the appropriate traits to include and which way to report plant biomass
 {
 #PCA with plant traits at harvest, rather than as DAS
 pca.matrix1=common.wide.complete[,c(5:15,21:23)]
@@ -67,10 +67,10 @@ rownames(pca.matrix1)=paste(common.wide.complete$genotype, common.wide.complete$
 pca_try<-prcomp(pca.matrix1, center=TRUE, scale.=TRUE)
 
 # pca.try2=PCA(pca.matrix1)
-# 
+#
 # trait.pc.cor=pca.try2$var$cor
 # obs.contrib=pca.try2$ind$contrib
-# 
+#
 # trait.pc.cor2=pca.try2$var$cor
 # obs.contrib2=pca.try2$ind$contrib
 
@@ -125,11 +125,6 @@ plot(pca_DAS$x[,1:2])
 biplot(pca_DAS)
 
 pca_DAS_table<-rbind(pca_DAS$rotation, pca_DAS$sdev)
-
-#output PC values 
-pca_DAS_x<-as.data.frame(cbind(name=rownames(pca_DAS$x), pca_DAS$x))
-save(pca_DAS_x, file="./pheno_PCA_predictions.Rdata")
-
 
 #visualize
 ggbiplot(pca_DAS, choices=c(1,2),labels.size = 2,obs.scale=1,varname.adjust = 1, var.scale=1, groups=env, ellipse=TRUE)
@@ -227,6 +222,10 @@ biplot(PCA_multiyear)
 PCA_multiyear_table<-rbind(PCA_multiyear$rotation, PCA_multiyear$sdev)
 write.csv(PCA_multiyear_table, file = './results/PCA_multiyear_trait_eigenvalues.csv')
 
+#output PC predictions
+pca_multiyear_x<-as.data.frame(cbind(name=rownames(PCA_multiyear$x), PCA_multiyear$x))
+save(pca_multiyear_x, file="./pheno_PCA_predictions.Rdata")
+
 #visualize
 ggbiplot(PCA_multiyear, choices=c(1,2),labels.size = 2,obs.scale=1,varname.adjust = 1, var.scale=1, groups=env, ellipse=TRUE)
 ggbiplot(PCA_multiyear, choices=c(1,3),labels.size = 2,obs.scale=1,varname.adjust = 1, var.scale=1, groups=env, ellipse=TRUE)
@@ -246,46 +245,6 @@ ggbiplot(PCA_multiyear, choices=c(2,3),labels.size = 2,obs.scale=1,varname.adjus
   theme_bw()
 dev.off()
 
-#PCA with limited harvest masses and no mass ratios
-colnames(common.wide.complete)
-pca.matrix.limited=as.matrix(common.wide.complete[,c(5:11,14,23)])
-#pca.matrix2=common.wide.complete[,c(5:10,16:21,23)]
-colnames(pca.matrix.limited)
-rownames(pca.matrix.limited)=paste(common.wide.complete$genotype, common.wide.complete$environment, sep="_")
-
-PCA_limited<-prcomp(pca.matrix.limited, center=TRUE, scale.=TRUE)
-
-PCA_limited$sdev
-PCA_limited$rotation
-PCA_limited$x
-geno.eigenvalues=as.matrix(PCA_limited$x)
-plot(PCA_limited)
-plot(PCA_limited, type="l")
-
-plot(PCA_limited$x[,1:2])
-biplot(PCA_limited)
-
-PCA_limited_table<-rbind(PCA_limited$rotation, PCA_limited$sdev)
-write.csv(PCA_limited_table, file = './results/PCA_multiyear_limited_trait_eigenvalues.csv')
-
-#visualize
-ggbiplot(PCA_limited, choices=c(1,2),labels.size = 2,obs.scale=1,varname.adjust = 1, var.scale=1, groups=env, ellipse=TRUE)
-ggbiplot(PCA_limited, choices=c(1,3),labels.size = 2,obs.scale=1,varname.adjust = 1, var.scale=1, groups=env, ellipse=TRUE)
-ggbiplot(PCA_limited, choices=c(2,3),labels.size = 2,obs.scale=1,varname.adjust = 1, var.scale=1, groups=env, ellipse=TRUE)
-ggbiplot(PCA_limited, choices=c(1,4),labels.size = 2,obs.scale=1,varname.adjust = 1, var.scale=1, groups=env, ellipse=TRUE)
-
-png("./results/PC12_limited.png", width=900, height=700)
-ggbiplot(PCA_limited, choices=c(1,2),labels.size = 2,obs.scale=1,varname.adjust = 1, var.scale=1, groups=env, ellipse=TRUE)+
-  theme_bw()
-dev.off()
-png("./results/PC13_limited.png", width=900, height=700)
-ggbiplot(PCA_limited, choices=c(1,3),labels.size = 2,obs.scale=1,varname.adjust = 1, var.scale=1, groups=env, ellipse=TRUE)+
-  theme_bw()
-dev.off()
-png("./results/PC23_limited.png", width=900, height=700)
-ggbiplot(PCA_limited, choices=c(2,3),labels.size = 2,obs.scale=1,varname.adjust = 1, var.scale=1, groups=env, ellipse=TRUE)+
-  theme_bw()
-dev.off()
 #----------------------------------------------------------------------------------------------------------#
 common.wide.complete$PC1=geno.eigenvalues[,1]
 common.wide.complete$PC2=geno.eigenvalues[,2]
@@ -336,7 +295,7 @@ colnames(common.wide.complete)
 mfa.data=common.wide.complete[,c(25,3,5:10,23,21,11:15)]
 
 colnames(mfa.data)
-try=MFA(mfa.data, group = c(1,1,4,3,6), type = c('n','n','s','s','s'), 
+try=MFA(mfa.data, group = c(1,1,4,3,6), type = c('n','n','s','s','s'),
         name.group = c('environment','genotype','leaf','architecture','biomass'),
         num.group.sup=c(1,2))
 barplot(try$eig[,1],main="Eigenvalues",names.arg=1:nrow(try$eig))
@@ -374,7 +333,7 @@ for(i in 1:length(traits)){
 multiplot(lfblade_area.cvplot,lfblade_weight.cvplot,SLA.cvplot,d13C.cvplot,tiller_number_cbrt.cvplot,
           panicle_emergence_DAS.cvplot,vegetative_mass_at_harvest.cvplot,leaf_mass_at_harvest.cvplot,stem_mass_at_harvest.cvplot,
           panicle_mass_at_harvest.cvplot,total_mass_at_harvest.cvplot,reproductive_vegetative_mass_ratio.cvplot,leaf_mass_ratio.cvplot,culm_height.cvplot, cols=4)
-ggplot(geno.CV)+geom_point(aes(reorder(genotype, CoV), CoV))+ 
+ggplot(geno.CV)+geom_point(aes(reorder(genotype, CoV), CoV))+
    facet_wrap(~trait)+
    theme_bw()+xlab(label = NULL)+ylab(label = NULL)+theme(axis.text.x = element_text(angle = 90))
 
@@ -382,5 +341,3 @@ cv.wide=geno.CV%>%spread(key=trait, value=CoV)
 
 ggpairs(upper = list(continuous = wrap('cor', size = 2.25, alignPercent=0.75)),
                                ggplot2::aes(colour=environment, alpha=0.7))+theme_bw()
-
-   
