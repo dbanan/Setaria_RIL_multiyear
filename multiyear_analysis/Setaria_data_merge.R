@@ -1,4 +1,4 @@
-#Setaria_data_merge
+#Setaria_data_merge - step 1
 
 #merge leaf-plant data  
 
@@ -77,6 +77,16 @@ dev.off()
 #stack leaf and plant level data 
 lp=bind_rows(leaf, plant)
 head(lp)
+lp$trait[which(lp$exp=='dn13.sim' & lp$trait=="gN.m2")]='sim_gN.m2'
+lp$trait[which(lp$exp=='dn13.stag' & lp$trait=="gN.m2")]='stag_gN.m2'
+lp$trait[which(lp$exp=='dn13.sim' & lp$trait=="gC.m2")]='sim_gC.m2'
+lp$trait[which(lp$exp=='dn13.stag' & lp$trait=="gC.m2")]='stag_gC.m2'
+lp$trait[which(lp$exp=='dn13.sim' & lp$trait=="CN_ratio")]='sim_CN_ratio'
+lp$trait[which(lp$exp=='dn13.stag' & lp$trait=="CN_ratio")]='stag_CN_ratio'
+lp$trait[which(lp$exp=='dn13.sim' & lp$trait=="d13C")]='sim_d13C'
+lp$trait[which(lp$exp=='dn13.stag' & lp$trait=="d13C")]='stag_d13C'
+lp$trait[which(lp$exp=='dn13.sim' & lp$trait=="SLA")]='sim_SLA'
+lp$trait[which(lp$exp=='dn13.stag' & lp$trait=="SLA")]='stag_SLA'
 
 #calculating percent of data for each year is NA value
 x=table(is.na(lp$value), lp$year)
